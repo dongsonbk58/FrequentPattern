@@ -6,10 +6,14 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
-import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -21,16 +25,11 @@ import android.widget.Toast;
 
 import com.example.cuongdx.frequentpattern.service.FileResponse;
 import com.example.cuongdx.frequentpattern.service.FileService;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -44,7 +43,6 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import utils.Application;
 import utils.Utils;
-import net.sourceforge.jtds.jdbc.Driver;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,9 +57,10 @@ public class MainActivity extends AppCompatActivity {
     String API_BASE_URL;
     File file;
     String imei;
-    private static final String url = "jdbc:mysql://192.168.0.101:80/permission_application";
-    private static final String user = "root";
-    private static final String pass = "vertrigo";
+    private DrawerLayout mdrawerlayout;
+    private ActionBarDrawerToggle mtoggle;
+    private Toolbar mtoolbar;
+    private NavigationView mnav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,14 +72,42 @@ public class MainActivity extends AppCompatActivity {
         ip = (EditText) findViewById(R.id.etid);
         textprogress = (TextView) findViewById(R.id.textprogress);
         progress = (ProgressBar) findViewById(R.id.progressBar);
-        ip.setText("");
+        mdrawerlayout = (DrawerLayout) findViewById(R.id.activity_main);
+        mtoolbar = (Toolbar) findViewById(R.id.nav_action);
+        setSupportActionBar(mtoolbar);
+        mtoggle = new ActionBarDrawerToggle(this, mdrawerlayout, R.string.Open, R.string.Close);
+        mdrawerlayout.addDrawerListener(mtoggle);
+        mtoggle.syncState();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mnav = (NavigationView) findViewById(R.id.nav);
+        mnav.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.nav_info:
+                        Intent info = new Intent(MainActivity.this,InfoActivity.class);
+                        startActivity(info);
+                        overridePendingTransition(R.anim.pull_in_right,R.anim.push_out_left);
+                        break;
+                    case R.id.nav_scan:
+                        Intent scan = new Intent(MainActivity.this,MainActivity.class);
+                        startActivity(scan);
+                        overridePendingTransition(R.anim.pull_in_right,R.anim.push_out_left);
+                        break;
+                    case R.id.nav_list_student:
 
+                        break;
+                }
+                return false;
+            }
+        });
+
+
+        ip.setText("");
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, list);
         lv.setAdapter(adapter);
-        TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         imei = tm.getDeviceId();
-
-
 
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,34 +128,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 File sdcard = Utils.getDirectory();
-                file = new File(sdcard, "transaction_"+imei+".txt");
-//                Connect task=new Connect();
-//                task.execute();
-
-//                String myUrl = "jdbc:mysql://10.0.0.2:80/permission";
-//
-//                try {
-//                    Class.forName("com.mysql.jdbc.Driver");
-//                    Connection conn = DriverManager.getConnection(myUrl, "root", "");
-//
-//                    // the mysql insert statement
-//                    String query = " insert into user (stt, name)"+ " values (?, ?)";
-//                    // create the mysql insert preparedstatement
-//                    PreparedStatement preparedStmt = conn.prepareStatement(query);
-//                    preparedStmt.setInt(1, 5);
-//                    preparedStmt.setString (2, "Rubble");
-//                    Log.e("son","abana");
-//
-//
-//                    // execute the preparedstatement
-//                    preparedStmt.execute();
-//                    preparedStmt.close();
-//                    conn.close();
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//
-//
+                file = new File(sdcard, "transaction_" + imei + ".txt");
 
 
                 StringBuilder text = new StringBuilder();
@@ -144,13 +144,11 @@ public class MainActivity extends AppCompatActivity {
                 }
 
 
-
                 if (ip.getText().toString() != "") {
-                    uploadfile(ip.getText().toString(),imei);
+                    uploadfile(ip.getText().toString(), imei);
                 } else {
                     Toast.makeText(MainActivity.this, "you need fill ip of server", Toast.LENGTH_LONG).show();
                 }
-
 
             }
         });
@@ -167,6 +165,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (mtoggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     protected void uploadfile(String ip, String imei) {
         API_BASE_URL = "http://202.191.58.39:8080/Server_X/";
@@ -181,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
         builder.addFormDataPart("files", file.getName(), RequestBody.create(MediaType.parse("text/*"), file));
 
         MultipartBody requestBody = builder.build();
-        Call<FileResponse> call = service.file(imei,requestBody);
+        Call<FileResponse> call = service.file(imei, requestBody);
         call.enqueue(new Callback<FileResponse>() {
             @Override
             public void onResponse(Call<FileResponse> call, Response<FileResponse> response) {
@@ -206,47 +211,6 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private class Connect extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... urls) {
-            String connection="";
-
-            // create a mysql database connection
-            //String myDriver = "org.gjt.mm.mysql.Driver";
-            String myUrl = "jdbc:mysql://192.168.0.101:3306/permission";
-
-            try {
-                Class.forName("com.mysql.jdbc.Driver");
-                Connection conn = DriverManager.getConnection(myUrl, "root", "");
-
-                // the mysql insert statement
-                String query = " insert into user (stt, name)"+ " values (?, ?)";
-                // create the mysql insert preparedstatement
-                PreparedStatement preparedStmt = conn.prepareStatement(query);
-                preparedStmt.setInt(1, 5);
-                preparedStmt.setString (2, "Rubble");
-                Log.e("son","abana");
-
-
-                // execute the preparedstatement
-                preparedStmt.execute();
-
-                conn.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            Log.e("son","abana");
-            return connection;
-
-        }
-
-
-        @Override
-        protected void onPostExecute(String result) {
-        }
-    }
-
 
     class ScanAll extends AsyncTask<Void, Application, Void> {
 
@@ -266,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                Utils.run(getApplicationContext(),imei);
+                Utils.run(getApplicationContext(), imei);
                 for (Application app : Utils.listApp) {
 //                    app = Utils.scanApp(getApplicationContext(), app);
                     publishProgress(app);
@@ -299,7 +263,6 @@ public class MainActivity extends AppCompatActivity {
             super.onPreExecute();
             textprogress.setText("scanning");
         }
-
 
 
         @Override
