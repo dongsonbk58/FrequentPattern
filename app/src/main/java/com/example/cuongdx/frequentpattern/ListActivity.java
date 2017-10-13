@@ -27,7 +27,7 @@ public class ListActivity extends AppCompatActivity {
         mtoolbar = (Toolbar) findViewById(R.id.nav_action);
         setSupportActionBar(mtoolbar);
         toolbartext = (TextView) findViewById(R.id.toolbar_text);
-        toolbartext.setText("Info");
+        toolbartext.setText("List Student");
         mtoggle1= new ActionBarDrawerToggle(ListActivity.this, mdrawerlayout, R.string.Open, R.string.Close);
         mdrawerlayout.addDrawerListener(mtoggle1);
         mtoggle1.syncState();

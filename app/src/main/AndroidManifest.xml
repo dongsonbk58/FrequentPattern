@@ -36,7 +36,8 @@
         </receiver>
 
         <activity android:name=".InfoActivity" />
-        <activity android:name=".ListActivity"></activity>
+        <activity android:name=".ListActivity" />
+        <activity android:name=".EditInfoActivity"></activity>
     </application>
 
 </manifest>

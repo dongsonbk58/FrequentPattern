@@ -43,10 +43,9 @@
                 android:gravity="left"
                 android:text="Tên:" />
 
-            <TextView
+            <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:textColor="@color/text"/>
 
             <TextView
@@ -55,10 +54,9 @@
                 android:gravity="left"
                 android:text="Lớp:" />
 
-            <TextView
+            <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:textColor="@color/text"/>
 
             <TextView
@@ -67,10 +65,9 @@
                 android:gravity="left"
                 android:text="MSSV:" />
 
-            <TextView
+            <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:textColor="@color/text"/>
 
             <TextView
@@ -79,10 +76,9 @@
                 android:gravity="left"
                 android:text="Mã lớp:" />
 
-            <TextView
+            <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:textColor="@color/text"/>
 
             <TextView
@@ -91,21 +87,11 @@
                 android:gravity="left"
                 android:text="Mã học phần:" />
 
-            <TextView
+            <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:textColor="@color/text"/>
         </LinearLayout>
     </LinearLayout>
 
-    <android.support.design.widget.NavigationView
-        android:id="@+id/nav"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        app:headerLayout="@layout/navigation_header"
-        app:menu="@menu/navigation_menu">
-
-    </android.support.design.widget.NavigationView>
 </android.support.v4.widget.DrawerLayout>
