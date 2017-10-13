@@ -12,7 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-public class InfoActivity extends AppCompatActivity {
+public class ListActivity extends AppCompatActivity {
     private DrawerLayout mdrawerlayout;
     private ActionBarDrawerToggle mtoggle1;
     private Toolbar mtoolbar;
@@ -22,13 +22,13 @@ public class InfoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_info);
+        setContentView(R.layout.activity_list);
         mdrawerlayout = (DrawerLayout) findViewById(R.id.activity_info);
         mtoolbar = (Toolbar) findViewById(R.id.nav_action);
         setSupportActionBar(mtoolbar);
         toolbartext = (TextView) findViewById(R.id.toolbar_text);
         toolbartext.setText("Info");
-        mtoggle1 = new ActionBarDrawerToggle(InfoActivity.this, mdrawerlayout, R.string.Open, R.string.Close);
+        mtoggle1= new ActionBarDrawerToggle(ListActivity.this, mdrawerlayout, R.string.Open, R.string.Close);
         mdrawerlayout.addDrawerListener(mtoggle1);
         mtoggle1.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -44,23 +44,24 @@ public class InfoActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.nav_info:
-                        Intent info = new Intent(InfoActivity.this, InfoActivity.class);
+                        Intent info = new Intent(ListActivity.this,InfoActivity.class);
                         startActivity(info);
-                        overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
+                        overridePendingTransition(R.anim.pull_in_right,R.anim.push_out_left);
                         finish();
                         break;
                     case R.id.nav_scan:
-                        Intent scan = new Intent(InfoActivity.this, MainActivity.class);
+                        Intent scan = new Intent(ListActivity.this,MainActivity.class);
                         startActivity(scan);
-                        overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
+                        overridePendingTransition(R.anim.pull_in_right,R.anim.push_out_left);
                         finish();
                         break;
                     case R.id.nav_list_student:
-                        Intent list = new Intent(InfoActivity.this, ListActivity.class);
+                        Intent list = new Intent(ListActivity.this,ListActivity.class);
                         startActivity(list);
-                        overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
+                        overridePendingTransition(R.anim.pull_in_right,R.anim.push_out_left);
                         finish();
                         break;
+
                 }
                 mdrawerlayout.closeDrawer(GravityCompat.START);
                 return true;

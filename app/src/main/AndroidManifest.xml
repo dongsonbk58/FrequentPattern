@@ -35,7 +35,8 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".InfoActivity"></activity>
+        <activity android:name=".InfoActivity" />
+        <activity android:name=".ListActivity"></activity>
     </application>
 
 </manifest>

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> list = new ArrayList<String>();
     ArrayAdapter adapter;
     EditText ip;
-    TextView textprogress;
+    TextView textprogress, toolbartext;
     ProgressBar progress;
     Button btn, btn1;
     String API_BASE_URL;
@@ -74,8 +75,10 @@ public class MainActivity extends AppCompatActivity {
         progress = (ProgressBar) findViewById(R.id.progressBar);
         mdrawerlayout = (DrawerLayout) findViewById(R.id.activity_main);
         mtoolbar = (Toolbar) findViewById(R.id.nav_action);
+        toolbartext = (TextView) findViewById(R.id.toolbar_text);
+        toolbartext.setText("Scan");
         setSupportActionBar(mtoolbar);
-        mtoggle = new ActionBarDrawerToggle(this, mdrawerlayout, R.string.Open, R.string.Close);
+        mtoggle = new ActionBarDrawerToggle(MainActivity.this, mdrawerlayout, R.string.Open, R.string.Close);
         mdrawerlayout.addDrawerListener(mtoggle);
         mtoggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -85,20 +88,28 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.nav_info:
-                        Intent info = new Intent(MainActivity.this,InfoActivity.class);
+
+                        Intent info = new Intent(MainActivity.this, InfoActivity.class);
                         startActivity(info);
-                        overridePendingTransition(R.anim.pull_in_right,R.anim.push_out_left);
+                        overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
+                        finish();
                         break;
                     case R.id.nav_scan:
-                        Intent scan = new Intent(MainActivity.this,MainActivity.class);
+
+                        Intent scan = new Intent(MainActivity.this, MainActivity.class);
                         startActivity(scan);
-                        overridePendingTransition(R.anim.pull_in_right,R.anim.push_out_left);
+                        overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
+                        finish();
                         break;
                     case R.id.nav_list_student:
-
+                        Intent list = new Intent(MainActivity.this, ListActivity.class);
+                        startActivity(list);
+                        overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
+                        finish();
                         break;
                 }
-                return false;
+                mdrawerlayout.closeDrawer(GravityCompat.START);
+                return true;
             }
         });
 
