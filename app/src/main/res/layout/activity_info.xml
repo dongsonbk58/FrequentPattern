@@ -28,8 +28,7 @@
             android:paddingBottom="@dimen/activity_vertical_margin"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin"
-            >
+            android:paddingTop="@dimen/activity_vertical_margin">
 
             <TextView
                 android:layout_width="match_parent"
@@ -43,11 +42,11 @@
                 android:gravity="left"
                 android:text="Tên:" />
 
-            <TextView
+            <EditText
+                android:id="@+id/ed_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="@color/text"/>
+                android:textColor="@color/text" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -55,11 +54,11 @@
                 android:gravity="left"
                 android:text="Lớp:" />
 
-            <TextView
+            <EditText
+                android:id="@+id/ed_lop"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="@color/text"/>
+                android:textColor="@color/text" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -67,11 +66,11 @@
                 android:gravity="left"
                 android:text="MSSV:" />
 
-            <TextView
+            <EditText
+                android:id="@+id/ed_mssv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="@color/text"/>
+                android:textColor="@color/text" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -79,11 +78,11 @@
                 android:gravity="left"
                 android:text="Mã lớp:" />
 
-            <TextView
+            <EditText
+                android:id="@+id/ed_malop"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="@color/text"/>
+                android:textColor="@color/text" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -91,11 +90,18 @@
                 android:gravity="left"
                 android:text="Mã học phần:" />
 
-            <TextView
+            <EditText
+                android:id="@+id/ed_mahocphan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="@color/text"/>
+                android:textColor="@color/text" />
+
+            <Button
+                android:id="@+id/bt_sendinfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="send" />
         </LinearLayout>
     </LinearLayout>
 

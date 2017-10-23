@@ -1,16 +1,40 @@
 package com.example.cuongdx.frequentpattern;
 
+import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.cuongdx.frequentpattern.model.User;
+import com.example.cuongdx.frequentpattern.service.FileResponse;
+import com.example.cuongdx.frequentpattern.service.FileService;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import utils.Utils;
 
 public class InfoActivity extends AppCompatActivity {
     private DrawerLayout mdrawerlayout;
@@ -18,6 +42,12 @@ public class InfoActivity extends AppCompatActivity {
     private Toolbar mtoolbar;
     private NavigationView mnav;
     private TextView toolbartext;
+    Button btn_send;
+    EditText ten,lop,masinhvien,mahocphan,malop;
+    String API_BASE_URL;
+    File file;
+    String imei;
+    User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +57,20 @@ public class InfoActivity extends AppCompatActivity {
         mtoolbar = (Toolbar) findViewById(R.id.nav_action);
         setSupportActionBar(mtoolbar);
         toolbartext = (TextView) findViewById(R.id.toolbar_text);
-        toolbartext.setText("Info");
+        btn_send = (Button) findViewById(R.id.bt_sendinfo);
+        ten = (EditText) findViewById(R.id.ed_name);
+        lop = (EditText) findViewById(R.id.ed_lop);
+        malop = (EditText) findViewById(R.id.ed_malop);
+        masinhvien = (EditText) findViewById(R.id.ed_mssv);
+        mahocphan = (EditText) findViewById(R.id.ed_mahocphan);
+        ten.setText("");
+        lop.setText("");
+        malop.setText("");
+        mahocphan.setText("");
+        masinhvien.setText("");
+
         mtoggle1 = new ActionBarDrawerToggle(InfoActivity.this, mdrawerlayout, R.string.Open, R.string.Close);
+        toolbartext.setText("Info");
         mdrawerlayout.addDrawerListener(mtoggle1);
         mtoggle1.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -66,5 +108,62 @@ public class InfoActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        imei = tm.getDeviceId();
+
+        btn_send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                File sdcard = Utils.getDirectory();
+                file = new File(sdcard, "transaction_" + imei + ".txt");
+                if(ten.getText().length()==0 || lop.getText().length()==0 || malop.getText().length()==0 || masinhvien.getText().length()==0 || mahocphan.getText().length()==0 ){
+                    Toast.makeText(getBaseContext(), "hay dien day du thong tin", Toast.LENGTH_SHORT).show();
+                }else{
+                    user = new User(ten.getText().toString(),lop.getText().toString(),masinhvien.getText().toString(), malop.getText().toString(),mahocphan.getText().toString(), imei.toString());
+                    StringBuilder text = new StringBuilder();
+                    try {
+                        BufferedReader br = new BufferedReader(new FileReader(file));
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            text.append(line);
+                            text.append('\n');
+                        }
+                        br.close();
+                    } catch (IOException e) {
+                    }
+
+                    uploadfile("",user, imei);
+                }
+            }
+        });
+    }
+
+    protected void uploadfile(String ip,User user, String imei) {
+        API_BASE_URL = "http://192.168.0.101:8080/Server_X/";
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(API_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        FileService service = retrofit.create(FileService.class);
+        MultipartBody.Builder builder = new MultipartBody.Builder();
+        builder.setType(MultipartBody.FORM);
+        builder.addFormDataPart("files", file.getName(), RequestBody.create(MediaType.parse("text/*"), file));
+
+        MultipartBody requestBody = builder.build();
+        Call<FileResponse> call = service.file(imei,user.getTen(),user.getLop(),user.getMalop(),user.getMssv(),user.getMahocphan(),requestBody);
+        call.enqueue(new Callback<FileResponse>() {
+            @Override
+            public void onResponse(Call<FileResponse> call, Response<FileResponse> response) {
+
+            }
+            @Override
+            public void onFailure(Call<FileResponse> call, Throwable t) {
+                Toast.makeText(getBaseContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 }

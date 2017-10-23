@@ -6,4 +6,5 @@
     <color name="color_green_icash">#ff404a</color>
     <color name="name">#ffffff</color>
     <color name="text">#fa0303</color>
+    <color name="colorArcBG">#fa0303</color>
 </resources>

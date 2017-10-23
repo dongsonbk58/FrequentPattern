@@ -11,14 +11,16 @@ public class User implements Serializable{
     private String lop;
     private String mssv;
     private String malop;
-    private String Mahocphan;
+    private String mahocphan;
+    private String imei;
 
-    public User(String ten, String lop, String mssv, String malop, String mahocphan) {
+    public User(String ten, String lop, String mssv, String malop, String mahocphan, String imei) {
         this.ten = ten;
         this.lop = lop;
         this.mssv = mssv;
         this.malop = malop;
-        this.Mahocphan = mahocphan;
+        this.mahocphan = mahocphan;
+        this.imei = imei;
     }
 
     public String getTen() {
@@ -53,11 +55,19 @@ public class User implements Serializable{
         this.malop = malop;
     }
 
+    public String getImei() {
+        return imei;
+    }
+
+    public void setImei(String imei) {
+        this.imei = imei;
+    }
+
     public String getMahocphan() {
-        return Mahocphan;
+        return mahocphan;
     }
 
     public void setMahocphan(String mahocphan) {
-        Mahocphan = mahocphan;
+        mahocphan = mahocphan;
     }
 }

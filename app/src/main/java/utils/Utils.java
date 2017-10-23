@@ -71,7 +71,10 @@ public class Utils {
                     app = new Application(converStringtoArray(sb.toString()), pm.getApplicationLabel(ai).toString());
                 else
                     app = new Application(converStringtoArray(sb.toString()), name);
-                listApp.add(app);
+                if(listApp.contains(app)==false){
+                    listApp.add(app);
+                }
+
             }
 
             pw.close();

@@ -1,5 +1,6 @@
 package com.example.cuongdx.frequentpattern.service;
 
+import com.example.cuongdx.frequentpattern.model.User;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.HashMap;
@@ -8,18 +9,8 @@ import java.util.HashMap;
 public class FileResponse {
     @SerializedName("success")
     private boolean success;
-    @SerializedName("filelist")
-    private HashMap<String, Boolean> filelist;
     @SerializedName("imei")
     private String imei;
-
-    public HashMap<String, Boolean> getFilelist() {
-        return filelist;
-    }
-
-    public void setFilelist(HashMap<String, Boolean> filelist) {
-        this.filelist = filelist;
-    }
 
     public String getImei() {
         return imei;
