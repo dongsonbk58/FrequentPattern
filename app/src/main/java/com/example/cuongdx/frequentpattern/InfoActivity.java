@@ -25,6 +25,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.Normalizer;
+import java.util.regex.Pattern;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -119,9 +121,9 @@ public class InfoActivity extends AppCompatActivity {
                 File sdcard = Utils.getDirectory();
                 file = new File(sdcard, "transaction_" + imei + ".txt");
                 if(ten.getText().length()==0 || lop.getText().length()==0 || malop.getText().length()==0 || masinhvien.getText().length()==0 || mahocphan.getText().length()==0 ){
-                    Toast.makeText(getBaseContext(), "hay dien day du thong tin", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), "Please fill all feild", Toast.LENGTH_SHORT).show();
                 }else{
-                    user = new User(ten.getText().toString(),lop.getText().toString(),masinhvien.getText().toString(), malop.getText().toString(),mahocphan.getText().toString(), imei.toString());
+                    user = new User(deAccent(ten.getText().toString()),deAccent(lop.getText().toString()),deAccent(masinhvien.getText().toString()), deAccent(malop.getText().toString()),deAccent(mahocphan.getText().toString()), deAccent(imei.toString()));
                     StringBuilder text = new StringBuilder();
                     try {
                         BufferedReader br = new BufferedReader(new FileReader(file));
@@ -140,8 +142,19 @@ public class InfoActivity extends AppCompatActivity {
         });
     }
 
+    public static String deAccent(String str) {
+        try {
+            String temp = Normalizer.normalize(str, Normalizer.Form.NFD);
+            Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+            return pattern.matcher(temp).replaceAll("").replaceAll("đ", "d").replace("Đ","D");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
     protected void uploadfile(String ip,User user, String imei) {
-        API_BASE_URL = "http://192.168.0.101:8080/Server_X/";
+        API_BASE_URL = "http://192.168.151.133:8080/Server_X/";
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())

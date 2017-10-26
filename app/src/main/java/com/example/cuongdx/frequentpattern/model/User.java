@@ -1,5 +1,8 @@
 package com.example.cuongdx.frequentpattern.model;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 /**
@@ -7,12 +10,25 @@ import java.io.Serializable;
  */
 
 public class User implements Serializable{
+    @SerializedName("ten")
+    @Expose
     private String ten;
+    @SerializedName("lop")
+    @Expose
     private String lop;
+    @SerializedName("mssv")
+    @Expose
     private String mssv;
+    @SerializedName("malop")
+    @Expose
     private String malop;
+    @SerializedName("mahocphan")
+    @Expose
     private String mahocphan;
+    @SerializedName("imei")
+    @Expose
     private String imei;
+
 
     public User(String ten, String lop, String mssv, String malop, String mahocphan, String imei) {
         this.ten = ten;

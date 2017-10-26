@@ -8,9 +8,30 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.cuongdx.frequentpattern.adapter.ListStudentAdapter;
+import com.example.cuongdx.frequentpattern.model.User;
+import com.example.cuongdx.frequentpattern.service.FileService;
+import com.example.cuongdx.frequentpattern.service.ListStudent;
+import com.google.gson.JsonObject;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ListActivity extends AppCompatActivity {
     private DrawerLayout mdrawerlayout;
@@ -18,10 +39,18 @@ public class ListActivity extends AppCompatActivity {
     private Toolbar mtoolbar;
     private NavigationView mnav;
     private TextView toolbartext;
+    private ListView listView;
+    private ArrayList<User> contactList;
+    private ListStudentAdapter adapter;
+    private TextView textlist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        contactList = new ArrayList<>();
+        listView = (ListView) findViewById(R.id.list);
+        textlist = (TextView) findViewById(R.id.textregis);
+
         setContentView(R.layout.activity_list);
         mdrawerlayout = (DrawerLayout) findViewById(R.id.activity_info);
         mtoolbar = (Toolbar) findViewById(R.id.nav_action);
@@ -65,6 +94,32 @@ public class ListActivity extends AppCompatActivity {
                 }
                 mdrawerlayout.closeDrawer(GravityCompat.START);
                 return true;
+            }
+        });
+        getAllUser();
+    }
+
+    public void getAllUser(){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://192.168.151.133:8080/Server_X/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        FileService service = retrofit.create(FileService.class);
+        Call<JsonObject> jsonCall = service.readJson();
+        jsonCall.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                Toast.makeText(ListActivity.this, response.body().toString(), Toast.LENGTH_LONG).show();
+//                contactList = response.body().getListStudent();
+//                Toast.makeText(ListActivity.this, contactList.size(), Toast.LENGTH_LONG).show();
+//                adapter = new ListStudentAdapter(ListActivity.this, contactList);
+//                listView.setAdapter(adapter);
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+
             }
         });
     }

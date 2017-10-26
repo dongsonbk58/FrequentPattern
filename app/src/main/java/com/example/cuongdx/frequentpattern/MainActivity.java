@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            textprogress.setText("scanning");
+            textprogress.setText("Scanning");
         }
 
 
@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Utils.run(getApplicationContext(), imei);
                 for (Application app : Utils.listApp) {
-                    SystemClock.sleep(30);
+                    SystemClock.sleep(20);
                     publishProgress(app);
                 }
             } catch (IOException e) {
@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             adapter.notifyDataSetChanged();
-            textprogress.setText("scan complete");
+            textprogress.setText("Scan complete");
         }
     }
 
@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            textprogress.setText("scanning");
+            textprogress.setText("Scanning");
         }
 
 
@@ -235,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            textprogress.setText("scan complete");
+            textprogress.setText("Scan complete");
         }
     }
 }
