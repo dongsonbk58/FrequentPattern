@@ -9,6 +9,11 @@
     tools:context="com.example.cuongdx.frequentpattern.MainActivity"
     tools:openDrawer="start"
     >
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:scrollbars="vertical"
+        >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -104,6 +109,7 @@
                 android:text="send" />
         </LinearLayout>
     </LinearLayout>
+    </ScrollView>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/nav"

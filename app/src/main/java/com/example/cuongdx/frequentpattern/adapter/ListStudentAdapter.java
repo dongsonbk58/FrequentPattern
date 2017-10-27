@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 import com.example.cuongdx.frequentpattern.R;
 import com.example.cuongdx.frequentpattern.model.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,61 +22,51 @@ import java.util.List;
  */
 
 public class ListStudentAdapter extends ArrayAdapter<User> {
-    List<User> list;
-    Context context;
-    private LayoutInflater mInflater;
-
-    // Constructors
-    public ListStudentAdapter(Context context, List<User> objects) {
-        super(context, 0, objects);
-        this.context = context;
-        this.mInflater = LayoutInflater.from(context);
-        list = objects;
+//    private int lastPosition = -1;
+//    Context mContext;
+    private static class ViewHolder {
+        TextView ten;
+        TextView mssv;
+        TextView lop;
+        ImageView img;
     }
 
+    public ListStudentAdapter(Context context, ArrayList<User> users) {
+        super(context, R.layout.layout_row_view, users);
+    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final ViewHolder vh;
+
+//        final View result;
+        User user = getItem(position);
+        ViewHolder viewHolder;
         if (convertView == null) {
-            View view = mInflater.inflate(R.layout.layout_row_view, parent, false);
-            vh = ViewHolder.create((RelativeLayout) view);
-            view.setTag(vh);
+
+            viewHolder = new ViewHolder();
+            LayoutInflater inflater = LayoutInflater.from(getContext());
+            convertView = inflater.inflate(R.layout.layout_row_view, parent, false);
+            viewHolder.ten = (TextView) convertView.findViewById(R.id.tvten);
+            viewHolder.mssv = (TextView) convertView.findViewById(R.id.tvmssv);
+            viewHolder.lop = (TextView) convertView.findViewById(R.id.tvlop);
+            viewHolder.img = (ImageView) convertView.findViewById(R.id.img);
+
+//            result=convertView;
+            convertView.setTag(viewHolder);
         } else {
-            vh = (ViewHolder) convertView.getTag();
+
+//            result=convertView;
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        User item = getItem(position);
+//        Animation animation = AnimationUtils.loadAnimation(mContext, (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
+//        result.startAnimation(animation);
+//        lastPosition = position;
 
-        vh.textViewTen.setText(item.getTen());
-        vh.textViewLop.setText(item.getLop());
-        vh.textViewMssv.setText(item.getMssv());
-        vh.imageView.setImageResource(R.drawable.ic_info_black_24dp);
+        viewHolder.ten.setText("Tên: "+ user.getTen());
+        viewHolder.lop.setText("Lớp: "+user.getLop());
+        viewHolder.mssv.setText("MSSV: "+user.getMssv());
 
-        return vh.rootView;
-    }
-
-    private static class ViewHolder {
-        public final RelativeLayout rootView;
-        public final ImageView imageView;
-        public final TextView textViewTen;
-        public final TextView textViewLop;
-        public final TextView textViewMssv;
-
-        private ViewHolder(RelativeLayout rootView, ImageView imageView, TextView textViewTen, TextView textViewLop,TextView textViewMssv) {
-            this.rootView = rootView;
-            this.imageView = imageView;
-            this.textViewTen = textViewTen;
-            this.textViewLop = textViewLop;
-            this.textViewMssv = textViewMssv;
-        }
-
-        public static ViewHolder create(RelativeLayout rootView) {
-            ImageView imageView = (ImageView) rootView.findViewById(R.id.imageView);
-            TextView textViewTen = (TextView) rootView.findViewById(R.id.tvten);
-            TextView textViewLop = (TextView) rootView.findViewById(R.id.tvlop);
-            TextView textViewMssv = (TextView) rootView.findViewById(R.id.tvmssv);
-            return new ViewHolder(rootView, imageView, textViewTen, textViewLop, textViewMssv);
-        }
+        return convertView;
     }
 }

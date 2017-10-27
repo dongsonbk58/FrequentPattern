@@ -154,7 +154,7 @@ public class InfoActivity extends AppCompatActivity {
     }
 
     protected void uploadfile(String ip,User user, String imei) {
-        API_BASE_URL = "http://192.168.151.133:8080/Server_X/";
+        API_BASE_URL = "http://192.168.100.5:8080/Server_X/";
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
