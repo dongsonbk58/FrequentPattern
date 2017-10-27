@@ -8,8 +8,11 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,12 +21,11 @@ import com.example.cuongdx.frequentpattern.adapter.ListStudentAdapter;
 import com.example.cuongdx.frequentpattern.model.User;
 import com.example.cuongdx.frequentpattern.service.FileService;
 import com.google.gson.JsonObject;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,6 +42,7 @@ public class ListActivity extends AppCompatActivity {
     private ListView studentlist;
     private ArrayList<User> contactList;
     private ListStudentAdapter adapter;
+    private EditText editsearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,7 @@ public class ListActivity extends AppCompatActivity {
         mtoolbar = (Toolbar) findViewById(R.id.nav_action);
         setSupportActionBar(mtoolbar);
         toolbartext = (TextView) findViewById(R.id.toolbar_text);
+        editsearch = (EditText) findViewById(R.id.search);
         toolbartext.setText("List Student");
         mtoggle1 = new ActionBarDrawerToggle(ListActivity.this, mdrawerlayout, R.string.Open, R.string.Close);
         mdrawerlayout.addDrawerListener(mtoggle1);
@@ -89,6 +93,28 @@ public class ListActivity extends AppCompatActivity {
                 }
                 mdrawerlayout.closeDrawer(GravityCompat.START);
                 return true;
+            }
+        });
+
+        editsearch.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void afterTextChanged(Editable arg0) {
+                // TODO Auto-generated method stub
+                String text = editsearch.getText().toString().toLowerCase(Locale.getDefault());
+                adapter.filter(text);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1,
+                                          int arg2, int arg3) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onTextChanged(CharSequence arg0, int arg1, int arg2,
+                                      int arg3) {
+                // TODO Auto-generated method stub
             }
         });
         getAllUser();

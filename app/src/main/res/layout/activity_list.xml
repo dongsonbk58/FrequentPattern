@@ -28,6 +28,28 @@
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:paddingTop="@dimen/activity_vertical_margin">
 
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/iconsearch"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/if_search_298865"/>
+
+                <EditText
+                    android:id="@+id/search"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/iconsearch"
+                    android:layout_alignParentTop="true">
+
+                    <requestFocus />
+                </EditText>
+            </RelativeLayout>
+
             <TextView
                 android:id="@+id/textregis"
                 android:layout_width="wrap_content"

@@ -41,6 +41,18 @@
             android:layout_height="wrap_content"
             android:textColor="@color/colorAccent"
             android:text="lop:"/>
+        <TextView
+            android:id="@+id/tvmalop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorAccent"
+            android:text="malop:"/>
+        <TextView
+            android:id="@+id/tvmahocphan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorAccent"
+            android:text="mahocphan:"/>
 
     </LinearLayout>
 
