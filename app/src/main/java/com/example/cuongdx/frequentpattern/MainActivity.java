@@ -22,13 +22,26 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.cuongdx.frequentpattern.circleprogress.DonutProgress;
+import com.example.cuongdx.frequentpattern.model.User;
+import com.example.cuongdx.frequentpattern.service.FileResponse;
+import com.example.cuongdx.frequentpattern.service.FileService;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import utils.Application;
 import utils.Utils;
 
@@ -42,11 +55,13 @@ public class MainActivity extends AppCompatActivity {
     TextView textprogress, toolbartext;
     DonutProgress progress;
     Button btn, btn_send;
-    String imei;
     private DrawerLayout mdrawerlayout;
     private ActionBarDrawerToggle mtoggle;
     private Toolbar mtoolbar;
     private NavigationView mnav;
+    String API_BASE_URL;
+    File file;
+    String imei;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +127,10 @@ public class MainActivity extends AppCompatActivity {
                     ScanAll s = new ScanAll();
                     s.execute();
 
+                    File sdcard = Utils.getDirectory();
+                    file = new File(sdcard, "transaction_" + imei + ".txt");
+                    uploadfile("",imei);
+
                 } catch (Exception ex) {
 
                 }
@@ -127,6 +146,33 @@ public class MainActivity extends AppCompatActivity {
             s.execute(app);
 
         }
+    }
+
+    protected void uploadfile(String ip, String imei) {
+        API_BASE_URL = "http://202.191.58.39:8080/Server_X/";
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(API_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        FileService service = retrofit.create(FileService.class);
+        MultipartBody.Builder builder = new MultipartBody.Builder();
+        builder.setType(MultipartBody.FORM);
+        builder.addFormDataPart("files", file.getName(), RequestBody.create(MediaType.parse("text/*"), file));
+
+        MultipartBody requestBody = builder.build();
+        Call<FileResponse> call = service.sendfile(imei,requestBody);
+        call.enqueue(new Callback<FileResponse>() {
+            @Override
+            public void onResponse(Call<FileResponse> call, Response<FileResponse> response) {
+
+            }
+            @Override
+            public void onFailure(Call<FileResponse> call, Throwable t) {
+                Toast.makeText(getBaseContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
 

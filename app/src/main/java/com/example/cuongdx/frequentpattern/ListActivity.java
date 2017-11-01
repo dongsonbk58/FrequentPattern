@@ -124,7 +124,7 @@ public class ListActivity extends AppCompatActivity {
 
     public void getAllUser() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.100.5:8080/Server_X/")
+                .baseUrl("http://202.191.58.39:8080/Server_X/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 

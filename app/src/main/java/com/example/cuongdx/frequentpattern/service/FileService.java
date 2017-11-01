@@ -18,6 +18,8 @@ public interface FileService {
                             @Query("malop") String malop,
                             @Query("masinhvien") String masinhvien,
                             @Query("mahocphan") String mahocphan, @Body RequestBody files);
+    @POST("file")
+    Call<FileResponse> sendfile(@Query(value = "imei", encoded = true) String imei,@Body RequestBody files);
 
     @GET("student.json")
     Call<JsonObject> readJson();
