@@ -3,12 +3,15 @@ package com.example.cuongdx.frequentpattern;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -28,6 +31,7 @@ import com.example.cuongdx.frequentpattern.circleprogress.DonutProgress;
 import com.example.cuongdx.frequentpattern.model.User;
 import com.example.cuongdx.frequentpattern.service.FileResponse;
 import com.example.cuongdx.frequentpattern.service.FileService;
+import com.example.cuongdx.frequentpattern.service.RequestPermissionHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +51,7 @@ import utils.Utils;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int REQUEST_WRITE_STORAGE = 2;
+    private RequestPermissionHandler mRequestPermissionHandler;
     ListView lv;
     ArrayList<String> list = new ArrayList<String>();
     ArrayAdapter adapter;
@@ -67,6 +71,22 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mRequestPermissionHandler = new RequestPermissionHandler();
+        mRequestPermissionHandler.requestPermission(this, new String[] {
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.USE_SIP, Manifest.permission.READ_EXTERNAL_STORAGE
+        }, 123, new RequestPermissionHandler.RequestPermissionListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(MainActivity.this, "onSuccess", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailed() {
+                Toast.makeText(MainActivity.this, "onFailed", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
         btn = (Button) findViewById(R.id.button);
         lv = (ListView) findViewById(R.id.lv);
         textprogress = (TextView) findViewById(R.id.textprogress);
@@ -116,9 +136,15 @@ public class MainActivity extends AppCompatActivity {
 
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, list);
         lv.setAdapter(adapter);
-        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        imei = tm.getDeviceId();
 
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
+
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 2);
+        } else {
+            TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            imei = tm.getDeviceId();
+        }
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -137,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        makeRequest();
+
 
         Intent intent = getIntent();
         if (intent != null && intent.getBooleanExtra("install", false)) {
@@ -165,7 +191,6 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<FileResponse>() {
             @Override
             public void onResponse(Call<FileResponse> call, Response<FileResponse> response) {
-
             }
             @Override
             public void onFailure(Call<FileResponse> call, Throwable t) {
@@ -184,17 +209,42 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+//    public void initPermission(){
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+//            }
+//            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+//            }
+//            if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+//                requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
+//            }
+//            if (checkSelfPermission(Manifest.permission.USE_SIP) != PackageManager.PERMISSION_GRANTED) {
+//                requestPermissions(new String[]{Manifest.permission.USE_SIP}, 1);
+//            }
+//        }
+//    }
 
-    protected void makeRequest() {
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
-                REQUEST_WRITE_STORAGE);
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 2:
+                if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+
+                }
+                break;
+
+            default:
+                break;
+        }
+        mRequestPermissionHandler.onRequestPermissionsResult(requestCode, permissions,
+                grantResults);
     }
+
+
 
 
     class ScanAll extends AsyncTask<Void, Application, Void> {
@@ -211,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Utils.run(getApplicationContext(), imei);
                 for (Application app : Utils.listApp) {
-                    SystemClock.sleep(20);
+                    SystemClock.sleep(10);
                     publishProgress(app);
                 }
             } catch (IOException e) {

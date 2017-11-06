@@ -60,6 +60,7 @@ public class InfoActivity extends AppCompatActivity {
         setSupportActionBar(mtoolbar);
         toolbartext = (TextView) findViewById(R.id.toolbar_text);
         btn_send = (Button) findViewById(R.id.bt_sendinfo);
+        btn_send.setText("SEND");
         ten = (EditText) findViewById(R.id.ed_name);
         lop = (EditText) findViewById(R.id.ed_lop);
         malop = (EditText) findViewById(R.id.ed_malop);
@@ -120,6 +121,7 @@ public class InfoActivity extends AppCompatActivity {
 
                 File sdcard = Utils.getDirectory();
                 file = new File(sdcard, "transaction_" + imei + ".txt");
+
                 if(ten.getText().length()==0 || lop.getText().length()==0 || malop.getText().length()==0 || masinhvien.getText().length()==0 || mahocphan.getText().length()==0 ){
                     Toast.makeText(getBaseContext(), "Please fill all feild", Toast.LENGTH_SHORT).show();
                 }else{
@@ -135,8 +137,13 @@ public class InfoActivity extends AppCompatActivity {
                         br.close();
                     } catch (IOException e) {
                     }
+                    if(file.length()==0 || !file.exists()){
+                        Toast.makeText(getBaseContext(), "Please Scan now", Toast.LENGTH_SHORT).show();
+                    }else{
+                        uploadfile("",user, imei);
+                    }
 
-                    uploadfile("",user, imei);
+
                 }
             }
         });
@@ -170,7 +177,8 @@ public class InfoActivity extends AppCompatActivity {
         call.enqueue(new Callback<FileResponse>() {
             @Override
             public void onResponse(Call<FileResponse> call, Response<FileResponse> response) {
-
+                Toast.makeText(getBaseContext(), "Data was sent to server", Toast.LENGTH_LONG).show();
+                btn_send.setText("SENT");
             }
             @Override
             public void onFailure(Call<FileResponse> call, Throwable t) {
