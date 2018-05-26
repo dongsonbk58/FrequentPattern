@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.example.cuongdx.frequentpattern.adapter.ListStudentAdapter;
 import com.example.cuongdx.frequentpattern.model.User;
+import com.example.cuongdx.frequentpattern.service.Common;
 import com.example.cuongdx.frequentpattern.service.FileService;
 import com.google.gson.JsonObject;
 import org.json.JSONArray;
@@ -43,6 +44,7 @@ public class ListActivity extends AppCompatActivity {
     private ArrayList<User> contactList;
     private ListStudentAdapter adapter;
     private EditText editsearch;
+    String API_BASE_URL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,8 +125,9 @@ public class ListActivity extends AppCompatActivity {
     }
 
     public void getAllUser() {
+        API_BASE_URL = "http://"+ Common.ip+":8080/Server_X/";
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://202.191.58.39:8080/Server_X/")
+                .baseUrl(API_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 

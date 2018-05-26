@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.text.format.Formatter;
 
 import com.example.cuongdx.frequentpattern.R;
 
@@ -20,6 +23,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.StringTokenizer;
+
+import static android.content.Context.WIFI_SERVICE;
 
 public class Utils {
     public static ArrayList<Permission> listPermission;
@@ -45,10 +50,10 @@ public class Utils {
 
                 String[] permission = pi.requestedPermissions;
                 StringBuilder sb = new StringBuilder();
-                String name = pi.packageName;
+                String packet = pi.packageName;
                 int k = 0;
                 if (permission != null && permission.length > 0) {
-                    pw.print(name + ":");
+                    pw.print(packet + ":");
                     for (String s : permission){
                         if (getID(listPermission, s) != -1) {
                             sb.append(getID(listPermission, s) + " ");
@@ -65,18 +70,16 @@ public class Utils {
 
 
 
-                ApplicationInfo ai = pm.getApplicationInfo(name, 0);
+//                ApplicationInfo ai = pm.getApplicationInfo(packet, 0);
                 Application app;
-                if (ai != null)
-                    app = new Application(converStringtoArray(sb.toString()), pm.getApplicationLabel(ai).toString());
-                else
-                    app = new Application(converStringtoArray(sb.toString()), name);
+//                if (ai != null)
+//                    app = new Application(converStringtoArray(sb.toString()), pm.getApplicationLabel(ai).toString());
+//                else
+                    app = new Application(converStringtoArray(sb.toString()), packet);
                 if(listApp.contains(app)==false){
                     listApp.add(app);
                 }
-
             }
-
             pw.close();
         } catch (Exception e) {
 
@@ -118,7 +121,6 @@ public class Utils {
             IOException {
           genTransaction(context, id);
     }
-
 
     public static ArrayList<Permission> getListPermission(Context context) {
         ArrayList<Permission> list = new ArrayList<Permission>();

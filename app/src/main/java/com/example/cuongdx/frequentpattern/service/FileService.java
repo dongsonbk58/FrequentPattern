@@ -19,8 +19,11 @@ public interface FileService {
                             @Query("masinhvien") String masinhvien,
                             @Query("mahocphan") String mahocphan, @Body RequestBody files);
     @POST("file")
-    Call<FileResponse> sendfile(@Query(value = "imei", encoded = true) String imei,@Body RequestBody files);
+    Call<FileResponse> sendfile(@Query(value = "imei", encoded = true) String imei, @Query(value = "ip", encoded = true) String ip, @Body RequestBody files);
 
     @GET("student.json")
     Call<JsonObject> readJson();
+
+    @GET("kq.json")
+    Call<JsonObject> readKQJson();
 }

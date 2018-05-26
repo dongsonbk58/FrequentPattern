@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,20 +31,31 @@ import android.widget.Toast;
 
 import com.example.cuongdx.frequentpattern.circleprogress.DonutProgress;
 import com.example.cuongdx.frequentpattern.model.User;
+import com.example.cuongdx.frequentpattern.service.Common;
 import com.example.cuongdx.frequentpattern.service.FileResponse;
 import com.example.cuongdx.frequentpattern.service.FileService;
 import com.example.cuongdx.frequentpattern.service.RequestPermissionHandler;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Converter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -54,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private RequestPermissionHandler mRequestPermissionHandler;
     ListView lv;
     ArrayList<String> list = new ArrayList<String>();
+    ArrayList<String> listone = new ArrayList<String>();
     ArrayAdapter adapter;
     EditText ip;
     TextView textprogress, toolbartext;
@@ -65,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     private NavigationView mnav;
     String API_BASE_URL;
     File file;
+    String ipaddress;
     String imei;
 
     @Override
@@ -75,14 +90,15 @@ public class MainActivity extends AppCompatActivity {
         mRequestPermissionHandler.requestPermission(this, new String[] {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.USE_SIP, Manifest.permission.READ_EXTERNAL_STORAGE
         }, 123, new RequestPermissionHandler.RequestPermissionListener() {
+
             @Override
             public void onSuccess() {
-                Toast.makeText(MainActivity.this, "onSuccess", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "request permission Success", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailed() {
-                Toast.makeText(MainActivity.this, "onFailed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "request permission failure", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -108,14 +124,12 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.nav_info:
-
                         Intent info = new Intent(MainActivity.this, InfoActivity.class);
                         startActivity(info);
                         overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
                         finish();
                         break;
                     case R.id.nav_scan:
-
                         Intent scan = new Intent(MainActivity.this, MainActivity.class);
                         startActivity(scan);
                         overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
@@ -133,7 +147,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, list);
         lv.setAdapter(adapter);
 
@@ -149,35 +162,32 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
-
                     ScanAll s = new ScanAll();
                     s.execute();
-
-                    File sdcard = Utils.getDirectory();
-                    file = new File(sdcard, "transaction_" + imei + ".txt");
-                    uploadfile("",imei);
-
                 } catch (Exception ex) {
-
                 }
             }
         });
-
-
 
         Intent intent = getIntent();
         if (intent != null && intent.getBooleanExtra("install", false)) {
             Application app = (Application) intent.getSerializableExtra("app");
             ScanOne s = new ScanOne();
             s.execute(app);
-
         }
     }
 
     protected void uploadfile(String ip, String imei) {
-        API_BASE_URL = "http://202.191.58.39:8080/Server_X/";
+        API_BASE_URL = "http://"+ Common.ip+":8080/Server_X/";
+        OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
+                .connectTimeout(4, TimeUnit.HOURS)
+                .readTimeout(4, TimeUnit.HOURS)
+                .writeTimeout(4, TimeUnit.HOURS)
+                .build();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API_BASE_URL)
+                .addConverterFactory(new NullOnEmptyConverterFactory())
+                .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -186,11 +196,15 @@ public class MainActivity extends AppCompatActivity {
         builder.setType(MultipartBody.FORM);
         builder.addFormDataPart("files", file.getName(), RequestBody.create(MediaType.parse("text/*"), file));
 
+        ipaddress = getIp(getApplicationContext());
         MultipartBody requestBody = builder.build();
-        Call<FileResponse> call = service.sendfile(imei,requestBody);
+        Call<FileResponse> call = service.sendfile(imei, ipaddress, requestBody);
         call.enqueue(new Callback<FileResponse>() {
             @Override
             public void onResponse(Call<FileResponse> call, Response<FileResponse> response) {
+                Toast.makeText(getBaseContext(), "complete", Toast.LENGTH_LONG).show();
+                Intent myIntent = new Intent(getApplicationContext(), Main2Activity.class);
+                startActivityForResult(myIntent, 0);
             }
             @Override
             public void onFailure(Call<FileResponse> call, Throwable t) {
@@ -198,6 +212,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+    public class NullOnEmptyConverterFactory extends Converter.Factory {
+
+        @Override
+        public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
+            final Converter<ResponseBody, ?> delegate = retrofit.nextResponseBodyConverter(this, type, annotations);
+            return new Converter<ResponseBody, Object>() {
+                @Override
+                public Object convert(ResponseBody body) throws IOException {
+                    if (body.contentLength() == 0) return null;
+                    return delegate.convert(body);                }
+            };
+        }
+    }
+
+    public static String getIp(Context context) {
+        WifiManager wifiManager =  (WifiManager) context.getSystemService(context.WIFI_SERVICE);
+        WifiInfo wifiInf = wifiManager.getConnectionInfo();
+        int ipAddress = wifiInf.getIpAddress();
+        String ip = String.format("%d.%d.%d.%d", (ipAddress & 0xff),(ipAddress >> 8 & 0xff),(ipAddress >> 16 & 0xff),(ipAddress >> 24 & 0xff));
+        return ip;
     }
 
 
@@ -208,24 +243,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-//    public void initPermission(){
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-//            }
-//            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-//            }
-//            if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-//                requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
-//            }
-//            if (checkSelfPermission(Manifest.permission.USE_SIP) != PackageManager.PERMISSION_GRANTED) {
-//                requestPermissions(new String[]{Manifest.permission.USE_SIP}, 1);
-//            }
-//        }
-//    }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -278,11 +295,9 @@ public class MainActivity extends AppCompatActivity {
             progress.setProgress(a);
             progress.setText(a + "%");
             String s = app.getName() + " --> " + Arrays.toString(app.getListPermission());
-            System.out.println("update: " + s);
             if (list.contains(s) == false) {
                 list.add(s);
             }
-
             adapter.notifyDataSetChanged();
         }
 
@@ -290,26 +305,40 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             adapter.notifyDataSetChanged();
+            File sdcard = Utils.getDirectory();
+            file = new File(sdcard, "transaction_" + imei + ".txt");
+            uploadfile("",imei);
             textprogress.setText("Scan complete");
         }
     }
 
     class ScanOne extends AsyncTask<Application, Application, String> {
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             textprogress.setText("Scanning");
         }
 
-
         @Override
         protected String doInBackground(Application... params) {
             Application app = params[0];
-//            app = Utils.scanApp(getApplicationContext(), app);
             String s = app.getName() + " --> " + Arrays.toString(app.getListPermission());
+            String s1 = app.getName()+": "+Arrays.toString(app.getListPermission())+": 0";
             if (list.contains(s) == false) {
                 list.add(s);
+            }
+            if (listone.contains(s1) == false) {
+                listone.add(s1);
+            }
+            try {
+                File dirctory = Utils.getDirectory();
+                File item = new File(dirctory, "transaction_"+imei+".txt");
+                PrintWriter pw = new PrintWriter(item);
+                pw.print(s1.replace("[","").replace("]","").replace(",",""));
+                pw.println();
+                pw.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             }
             return s;
         }
@@ -318,7 +347,6 @@ public class MainActivity extends AppCompatActivity {
         protected void onProgressUpdate(Application... values) {
             super.onProgressUpdate(values);
             Application app = values[0];
-//            progress.setProgress(Arrays.asList(Utils.listApp).indexOf(app));
             progress.setProgress(Utils.listApp.size());
             progress.setText((Utils.listApp).indexOf(app) + "");
             String s = app.getName() + " --> " + Arrays.toString(app.getListPermission());
@@ -332,6 +360,9 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             textprogress.setText("Scan complete");
+            File sdcard = Utils.getDirectory();
+            file = new File(sdcard, "transaction_"+imei+".txt");
+            uploadfile("",imei);
         }
     }
 }

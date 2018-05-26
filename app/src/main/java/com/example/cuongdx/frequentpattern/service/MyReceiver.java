@@ -57,10 +57,10 @@ public class MyReceiver extends BroadcastReceiver {
             ApplicationInfo ai = pm.getApplicationInfo(str, 0);
             Application app;
             int[] list = converStringtoArray(sb.toString());
-            if (ai != null)
-                app = new Application(list, pm.getApplicationLabel(ai).toString());
-            else
-                app = new Application(list, str);
+//            if (ai != null)
+//                app = new Application(list, pm.getApplicationLabel(ai).toString());
+//            else
+            app = new Application(list, str);
             Intent i = new Intent(context, MainActivity.class);
             i.putExtra("app", (Serializable) app);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -15,7 +15,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-
         <include
             layout="@layout/navigation_action"
             android:layout_width="match_parent"
@@ -34,7 +33,7 @@
                 android:id="@+id/textprogress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="progress" />
+                android:text="Progress" />
 
             <!--<ProgressBar-->
                 <!--android:id="@+id/progressBar"-->
@@ -89,7 +88,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:text="All packet scaned"
+                android:text="All packets scanned"
                 android:textSize="18dp" />
 
             <ListView
